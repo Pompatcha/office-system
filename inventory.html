@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Inventory Control | Siam10 / FAOS</title>
+<style>
+body{font-family:Segoe UI,Tahoma;background:#f4f6f9;padding:20px}
+.container{max-width:900px;margin:auto;background:#fff;padding:25px}
+h2{margin-top:0}
+select,input,button{padding:8px;width:100%;margin-top:8px}
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{border:1px solid #ccc;padding:8px;text-align:center}
+th{background:#198754;color:#fff}
+button{width:auto;margin-right:5px}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>📦 Inventory Control</h2>
+
+<label>หมวดสินค้า</label>
+<select id="category" onchange="loadProducts()">
+  <option value="">-- เลือกหมวด --</option>
+  <option value="น้ำผึ้ง">น้ำผึ้ง</option>
+  <option value="น้ำมันมะกอก">น้ำมันมะกอก</option>
+</select>
+
+<label>สินค้าย่อย</label>
+<select id="product"></select>
+
+<label>จำนวน</label>
+<input type="number" id="qty" value="1">
+
+<button onclick="addStock()">➕ เพิ่มสต็อก</button>
+<button onclick="removeStock()">➖ ตัดสต็อก</button>
+
+<table>
+<thead>
+<tr>
+<th>หมวด</th>
+<th>สินค้า</th>
+<th>คงเหลือ</th>
+</tr>
+</thead>
+<tbody id="stockTable"></tbody>
+</table>
+</div>
+
+<script>
+const products = {
+  "น้ำผึ้ง":[
+    "น้ำผึ้งดอกส้ม",
+    "น้ำผึ้งออร์แกนิคจากป่าต้นโอ๊ก",
+    "น้ำผึ้งออร์แกนิคจากต้นสน",
+    "น้ำผึ้งออร์แกนิคไทม์",
+    "น้ำผึ้งออร์แกนิคต้นเฟอร์",
+    "น้ำผึ้งออร์แกนิคต้นเฟอร์ไข่มุก",
+    "น้ำผึ้งออร์แกนิคจากต้นเกาลัด"
+  ],
+  "น้ำมันมะกอก":[
+    "พรีเมี่ยมเอ็กซ์ตร้าเวอร์จิ้นโอลีฟออย สายพันธุ์อโธนาเลีย",
+    "น้ำมันมะกอกเอ็กซ์ตร้าเวอร์จินออร์แกนิก พันธุ์โคโรเนอิกิ"
+  ]
+};
+
+let stock = JSON.parse(localStorage.getItem("inventory") || "{}");
+
+function loadProducts(){
+  product.innerHTML="";
+  (products[category.value]||[]).forEach(p=>{
+    product.innerHTML+=`<option>${p}</option>`;
+  });
+}
+
+function addStock(){
+  const key=category.value+"|"+product.value;
+  stock[key]=(stock[key]||0)+(+qty.value);
+  save();
+}
+
+function removeStock(){
+  const key=category.value+"|"+product.value;
+  stock[key]=(stock[key]||0)-(+qty.value);
+  if(stock[key]<0)stock[key]=0;
+  save();
+}
+
+function save(){
+  localStorage.setItem("inventory",JSON.stringify(stock));
+  render();
+}
+
+function render(){
+  stockTable.innerHTML="";
+  Object.keys(stock).forEach(k=>{
+    const [c,p]=k.split("|");
+    stockTable.innerHTML+=`
+    <tr>
+      <td>${c}</td>
+      <td>${p}</td>
+      <td>${stock[k]}</td>
+    </tr>`;
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
