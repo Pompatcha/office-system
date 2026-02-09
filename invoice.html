@@ -82,11 +82,34 @@ canvas {
   .container { box-shadow:none; padding:10px; }
   .company-logo { height:60px; }
 }
+.top-nav {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.back-btn {
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.back-btn:hover {
+  background: #5a6268;
+}
 </style>
 </head>
 
 <body>
 <div class="container">
+  <div class="top-nav">
+  <a href="index.html" class="back-btn">⬅ กลับ Dashboard</a>
+</div>
 
 <!-- ===== Header ===== -->
 <div class="flex">
