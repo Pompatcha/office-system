@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Invoice| Siam10 / FAOS</title>
+
+<style>
+body {
+  font-family:"Segoe UI",Tahoma,sans-serif;
+  background:#f2f4f7;
+  padding:20px;
+}
+.container {
+  max-width:1100px;
+  background:#fff;
+  margin:auto;
+  padding:30px;
+}
+.flex {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+hr { margin:20px 0; }
+
+/* ===== Company ===== */
+.company-box {
+  display:flex;
+  align-items:center;
+  gap:15px;
+  text-align:right;
+}
+.company-logo {
+  height:70px;
+  max-width:140px;
+  object-fit:contain;
+}
+.company-info {
+  font-size:14px;
+  line-height:1.5;
+}
+
+/* ===== Table ===== */
+table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+th,td {
+  border:1px solid #ccc;
+  padding:8px;
+  text-align:center;
+}
+th {
+  background:#0d6efd;
+  color:#fff;
+}
+.summary td {
+  border:none;
+  padding:6px;
+}
+input, textarea, select {
+  width:100%;
+  padding:6px;
+  box-sizing:border-box;
+}
+button {
+  padding:10px 16px;
+  margin-top:15px;
+  margin-right:8px;
+}
+
+/* ===== Signature ===== */
+canvas {
+  border:1px solid #999;
+}
+
+/* ===== Print ===== */
+@media print {
+  button { display:none; }
+  body { background:#fff; }
+  .container { box-shadow:none; padding:10px; }
+  .company-logo { height:60px; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<!-- ===== Header ===== -->
+<div class="flex">
+  <div>
+    <h2 style="margin:0;">Invoice</h2>
+    <b>Quote No:</b> <span id="quoteNo"></span><br>
+    <b>Date:</b> <input type="date" id="quoteDate">
+  </div>
+
+  <div class="company-box">
+    <img src="assets/logo.png" class="company-logo" alt="SIAM10 FAOS Logo">
+    <div class="company-info">
+      <b>Siam10 / FAOS</b><br>
+      333/253 ถนนฉลองกรุง<br>
+      แขวงลำปาทิว เขตลาดกระบัง<br>
+      กรุงเทพฯ 10520<br>
+      www.faos.asia | Tel: +66 89 693 1668
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ===== Customer ===== -->
+<h4>BILLED TO</h4>
+<input id="customer" placeholder="Customer Name">
+<input id="address" placeholder="Customer Address">
+<input id="phone" placeholder="Phone / Email">
+
+<h4 style="margin-top:20px;">PAYMENT TYPE</h4>
+<select id="paymentType">
+  <option value="">-- เลือกรูปแบบการชำระเงิน --</option>
+  <option value="เงินสด">เงินสด</option>
+  <option value="ฝากขาย">ฝากขาย</option>
+</select>
+
+<!-- ===== Items ===== -->
+<table id="items">
+<thead>
+<tr>
+  <th style="width:50px;">#</th>
+  <th>DESCRIPTION</th>
+  <th style="width:120px;">UNIT COST</th>
+  <th style="width:100px;">QTY</th>
+  <th style="width:140px;">AMOUNT</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<button onclick="addRow()">➕ Add Item</button>
+
+<!-- ===== Summary ===== -->
+<table class="summary">
+<tr>
+  <td style="text-align:right;">SUBTOTAL</td>
+  <td style="text-align:right;" id="sub">0.00</td>
+</tr>
+<tr>
+  <td style="text-align:right;">DISCOUNT</td>
+  <td style="text-align:right;">
+    <input type="number" id="discount" value="0" oninput="calcTotal()">
+  </td>
+</tr>
+<tr>
+  <td style="text-align:right;">TAX 5%</td>
+  <td style="text-align:right;" id="tax">0.00</td>
+</tr>
+<tr>
+  <td style="text-align:right;"><b>TOTAL</b></td>
+  <td style="text-align:right;"><b id="total">0.00</b></td>
+</tr>
+</table>
+
+<!-- ===== Note ===== -->
+<h4>NOTE / REMARK</h4>
+<textarea id="note" placeholder="หมายเหตุเพิ่มเติม เช่น เงื่อนไขการส่งสินค้า / การชำระเงิน"></textarea>
+
+<hr>
+
+<!-- ===== Approval ===== -->
+<h4>APPROVAL</h4>
+<table style="border:none;">
+<tr>
+<td>
+พนักงานขาย<br>
+<canvas id="signSales" width="250" height="80"></canvas><br>
+<input placeholder="ชื่อ-นามสกุล">
+วันที่ <input type="date">
+</td>
+
+<td>
+หัวหน้างาน<br>
+<canvas id="signManager" width="250" height="80"></canvas><br>
+<input placeholder="ชื่อ-นามสกุล">
+วันที่ <input type="date">
+</td>
+
+<td>
+ผู้อนุมัติ<br>
+<canvas id="signApprove" width="250" height="80"></canvas><br>
+<input placeholder="ชื่อ-นามสกุล">
+วันที่ <input type="date">
+</td>
+</tr>
+</table>
+
+<hr>
+
+<button onclick="saveQuotation()">💾 Save Quotation</button>
+<button onclick="createInvoice()">➡ Create Invoice</button>
+<button onclick="window.print()">🖨 Print</button>
+
+</div>
+
+<script>
+/* ===== Quote No Auto ===== */
+function generateQuoteNo(){
+  const d=new Date();
+  const date=d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+  const key="QT_COUNT_"+date;
+  let n=(parseInt(localStorage.getItem(key))||0)+1;
+  localStorage.setItem(key,n);
+  return `QT-${date}-${String(n).padStart(3,'0')}`;
+}
+quoteNo.innerText=generateQuoteNo();
+quoteDate.valueAsDate=new Date();
+
+/* ===== Items with Auto No ===== */
+let items=[];
+const body=document.querySelector("#items tbody");
+
+function addRow(){
+  const i=items.length;
+  items.push({desc:"",cost:0,qty:0});
+  body.innerHTML+=`
+  <tr>
+    <td>${i+1}</td>
+    <td><input oninput="update(${i})"></td>
+    <td><input type="number" oninput="update(${i})"></td>
+    <td><input type="number" oninput="update(${i})"></td>
+    <td id="amt${i}">0.00</td>
+  </tr>`;
+}
+
+function update(i){
+  const r=body.rows[i].querySelectorAll("input");
+  items[i]={desc:r[0].value,cost:+r[1].value||0,qty:+r[2].value||0};
+  document.getElementById("amt"+i).innerText=(items[i].cost*items[i].qty).toFixed(2);
+  calcTotal();
+}
+
+function calcTotal(){
+  const sub=items.reduce((s,x)=>s+x.cost*x.qty,0);
+  const dis=+discount.value||0;
+  const tax=(sub-dis)*0.05;
+  document.getElementById("sub").innerText=sub.toFixed(2);
+  document.getElementById("tax").innerText=tax.toFixed(2);
+  document.getElementById("total").innerText=(sub-dis+tax).toFixed(2);
+}
+
+/* ===== Save ===== */
+function saveQuotation(){
+  const data=JSON.parse(localStorage.getItem("quotations")||"[]");
+  const q={
+    id:quoteNo.innerText,
+    date:quoteDate.value,
+    customer:customer.value,
+    address:address.value,
+    phone:phone.value,
+    paymentType:paymentType.value,
+    items,
+    subtotal:sub.innerText,
+    discount:discount.value,
+    tax:tax.innerText,
+    total:total.innerText,
+    note:note.value
+  };
+  data.push(q);
+  localStorage.setItem("quotations",JSON.stringify(data));
+  localStorage.setItem("lastQuotation",q.id);
+  alert("บันทึก Quotation เรียบร้อย");
+}
+
+function createInvoice(){
+  saveQuotation();
+  location.href="invoice.html";
+}
+
+/* ===== Signature ===== */
+function enableSign(id){
+  const c=document.getElementById(id);
+  const ctx=c.getContext("2d");
+  let draw=false;
+  c.onmousedown=()=>draw=true;
+  c.onmouseup=()=>{draw=false;ctx.beginPath();};
+  c.onmousemove=e=>{
+    if(!draw)return;
+    ctx.lineWidth=2;
+    ctx.lineCap="round";
+    ctx.lineTo(e.offsetX,e.offsetY);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(e.offsetX,e.offsetY);
+  };
+}
+["signSales","signManager","signApprove"].forEach(enableSign);
+
+addRow();
+</script>
+
+</body>
+</html>
