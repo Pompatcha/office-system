@@ -5,13 +5,15 @@
 <title>Inventory Control | Siam10 / FAOS</title>
 <style>
 body{font-family:Segoe UI,Tahoma;background:#f4f6f9;padding:20px}
-.container{max-width:900px;margin:auto;background:#fff;padding:25px}
+.container{max-width:1000px;margin:auto;background:#fff;padding:25px}
 h2{margin-top:0}
-select,input,button{padding:8px;width:100%;margin-top:8px}
+select,input,button{padding:8px;width:100%;margin-top:6px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 table{width:100%;border-collapse:collapse;margin-top:20px}
 th,td{border:1px solid #ccc;padding:8px;text-align:center}
 th{background:#198754;color:#fff}
-button{width:auto;margin-right:5px}
+.log th{background:#0d6efd}
+button{width:auto;margin-right:5px;margin-top:10px}
 </style>
 </head>
 <body>
@@ -19,22 +21,47 @@ button{width:auto;margin-right:5px}
 <div class="container">
 <h2>📦 Inventory Control</h2>
 
-<label>หมวดสินค้า</label>
-<select id="category" onchange="loadProducts()">
-  <option value="">-- เลือกหมวด --</option>
-  <option value="น้ำผึ้ง">น้ำผึ้ง</option>
-  <option value="น้ำมันมะกอก">น้ำมันมะกอก</option>
+<div class="row">
+  <div>
+    <label>หมวดสินค้า</label>
+    <select id="category" onchange="loadProducts()">
+      <option value="">-- เลือกหมวด --</option>
+      <option value="น้ำผึ้ง">น้ำผึ้ง</option>
+      <option value="น้ำมันมะกอก">น้ำมันมะกอก</option>
+    </select>
+  </div>
+
+  <div>
+    <label>สินค้าย่อย</label>
+    <select id="product"></select>
+  </div>
+</div>
+
+<div class="row">
+  <div>
+    <label>จำนวน</label>
+    <input type="number" id="qty" value="1">
+  </div>
+
+  <div>
+    <label>ชื่อผู้ดำเนินการ</label>
+    <label>ชื่อผู้ดำเนินการ</label>
+<select id="person">
+  <option value="">-- เลือกชื่อผู้ดำเนินการ --</option>
+  <option value="Patcharin">Patcharin</option>
+  <option value="Malisa">Malisa</option>
+  <option value="Patcharee">Patcharee</option>
+  <option value="Nikolas">Nikolas</option>
+  <option value="Pimphat">Pimphat</option>
 </select>
+  </div>
+</div>
 
-<label>สินค้าย่อย</label>
-<select id="product"></select>
+<button onclick="addStock()">➕ เพิ่มสต๊อก</button>
+<button onclick="removeStock()">➖ ตัดสต๊อก</button>
 
-<label>จำนวน</label>
-<input type="number" id="qty" value="1">
-
-<button onclick="addStock()">➕ เพิ่มสต็อก</button>
-<button onclick="removeStock()">➖ ตัดสต็อก</button>
-
+<!-- ===== Current Stock ===== -->
+<h3>📊 สต๊อกคงเหลือ</h3>
 <table>
 <thead>
 <tr>
@@ -45,10 +72,27 @@ button{width:auto;margin-right:5px}
 </thead>
 <tbody id="stockTable"></tbody>
 </table>
+
+<!-- ===== Stock Log ===== -->
+<h3>🕒 ประวัติการเคลื่อนไหวสต๊อก</h3>
+<table class="log">
+<thead>
+<tr>
+<th>ประเภท</th>
+<th>หมวด</th>
+<th>สินค้า</th>
+<th>จำนวน</th>
+<th>ผู้ดำเนินการ</th>
+<th>วันที่</th>
+</tr>
+</thead>
+<tbody id="logTable"></tbody>
+</table>
+
 </div>
 
 <script>
-const products = {
+const products={
   "น้ำผึ้ง":[
     "น้ำผึ้งดอกส้ม",
     "น้ำผึ้งออร์แกนิคจากป่าต้นโอ๊ก",
@@ -64,7 +108,8 @@ const products = {
   ]
 };
 
-let stock = JSON.parse(localStorage.getItem("inventory") || "{}");
+let inventory=JSON.parse(localStorage.getItem("inventory")||"{}");
+let logs=JSON.parse(localStorage.getItem("stockLogs")||"[]");
 
 function loadProducts(){
   product.innerHTML="";
@@ -73,34 +118,63 @@ function loadProducts(){
   });
 }
 
+function now(){
+  const d=new Date();
+  return d.toLocaleDateString("th-TH")+" "+d.toLocaleTimeString("th-TH");
+}
+
 function addStock(){
-  const key=category.value+"|"+product.value;
-  stock[key]=(stock[key]||0)+(+qty.value);
-  save();
+  action("ADD");
 }
 
 function removeStock(){
+  action("REMOVE");
+}
+
+function action(type){
+  if(!person.value) return alert("กรุณาใส่ชื่อผู้ดำเนินการ");
   const key=category.value+"|"+product.value;
-  stock[key]=(stock[key]||0)-(+qty.value);
-  if(stock[key]<0)stock[key]=0;
+  const q=+qty.value;
+  inventory[key]=(inventory[key]||0)+(type==="ADD"?q:-q);
+  if(inventory[key]<0) inventory[key]=0;
+
+  logs.unshift({
+    type:type==="ADD"?"เพิ่มสต๊อก":"ตัดสต๊อก",
+    category:category.value,
+    product:product.value,
+    qty:q,
+    person:person.value,
+    date:now()
+  });
+
   save();
 }
 
 function save(){
-  localStorage.setItem("inventory",JSON.stringify(stock));
+  localStorage.setItem("inventory",JSON.stringify(inventory));
+  localStorage.setItem("stockLogs",JSON.stringify(logs));
   render();
 }
 
 function render(){
   stockTable.innerHTML="";
-  Object.keys(stock).forEach(k=>{
+  Object.keys(inventory).forEach(k=>{
     const [c,p]=k.split("|");
     stockTable.innerHTML+=`
-    <tr>
-      <td>${c}</td>
-      <td>${p}</td>
-      <td>${stock[k]}</td>
-    </tr>`;
+      <tr><td>${c}</td><td>${p}</td><td>${inventory[k]}</td></tr>`;
+  });
+
+  logTable.innerHTML="";
+  logs.slice(0,20).forEach(l=>{
+    logTable.innerHTML+=`
+      <tr>
+        <td>${l.type}</td>
+        <td>${l.category}</td>
+        <td>${l.product}</td>
+        <td>${l.qty}</td>
+        <td>${l.person}</td>
+        <td>${l.date}</td>
+      </tr>`;
   });
 }
 
