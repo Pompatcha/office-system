@@ -90,6 +90,18 @@ body {
     color: #dc3545;
 }
 
+/* 🚨 ALERT EFFECT */
+.alert-card {
+    border: 2px solid #dc3545;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% { box-shadow: 0 0 0 rgba(220,53,69,0.4); }
+    50% { box-shadow: 0 0 15px rgba(220,53,69,0.8); }
+    100% { box-shadow: 0 0 0 rgba(220,53,69,0.4); }
+}
+
 /* ===== Quick Buttons ===== */
 .quick-actions {
     margin-top: 30px;
@@ -114,21 +126,16 @@ body {
     background: #e9ecef;
 }
 
-/* ===== Tablet / Mobile ===== */
 @media (max-width: 768px) {
     .sidebar {
         width: 180px;
-    }
-
-    .header {
-        font-size: 20px;
     }
 }
 </style>
 </head>
 
 <body>
-
+ 
 <div class="wrapper">
 
     <!-- Sidebar -->
@@ -142,63 +149,46 @@ body {
         <a href="quotation.html">🖨 Quotation</a>
         <a href="invoice.html">🖨 Invoice</a>
     </div>
-
     <!-- Main Content -->
     <div class="main">
         <div class="header">Dashboard ภาพรวมระบบ</div>
 
-        <!-- Summary Cards -->
-        <div class="cards">
-            <div class="card">
-                <h3>อุณหภูมิล่าสุด</h3>
-                <div class="value normal" id="tempStatus">ปกติ</div>
-            </div>
+<div class="cards">
 
-            <div class="card">
-                <h3>ค่าอุณหภูมิ (°C)</h3>
-                <div class="value" id="tempValue">--</div>
-            </div>
-
-            <div class="card">
-                <h3>ผู้เข้าออกวันนี้</h3>
-                <div class="value" id="visitorCount">0</div>
-            </div>
-
-            <div class="card">
-                <h3>วันที่ / เวลา</h3>
-                <div class="value" id="dateTime">--</div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <a class="action-btn" href="temperature.html">
-                🌡 บันทึกอุณหภูมิ
-            </a>
-
-            <a class="action-btn" href="visitor.html">
-                🛂 บันทึกบุคคลเข้า–ออก
-            </a>
-
-            <a class="action-btn" href="inventory.html">
-                📁 ดูข้อมูลย้อนหลัง
-            </a>
-
-            <a class="action-btn" href="report.html">
-                🖨 พิมพ์รายงาน
-            </a>
-        </div>
+    <div class="card" id="tempCard">
+        <h3>อุณหภูมิล่าสุด</h3>
+        <div class="value" id="tempStatus">--</div>
     </div>
+
+    <div class="card">
+        <h3>ค่าอุณหภูมิ (°C)</h3>
+        <div class="value" id="tempValue">--</div>
+    </div>
+
+    <div class="card">
+        <h3>ผู้เข้าออกวันนี้</h3>
+        <div class="value" id="visitorCount">0</div>
+    </div>
+
+    <div class="card">
+        <h3>วันที่ / เวลา</h3>
+        <div class="value" id="dateTime">--</div>
+    </div>
+
 </div>
-/* ===== Log in===== */
+
+<div class="quick-actions">
+    <a class="action-btn" href="temperature.html">🌡 บันทึกอุณหภูมิ</a>
+    <a class="action-btn" href="visitor.html">🛂 บันทึกบุคคลเข้า–ออก</a>
+    <a class="action-btn" href="inventory.html">📁 ตรวจสินค้าคงคลัง</a>
+    <a class="action-btn" href="report.html">🖨 พิมพ์รายงาน</a>
+</div>
+
+</div>
+</div>
+
 <script>
-    <script>
-const user = JSON.parse(localStorage.getItem("currentUser"));
-if(!user){
-  location.href = "login.html";
-
-
-/* ===== Date & Time ===== */
+/* ===== DATE TIME ===== */
 function updateDateTime() {
     const now = new Date();
     document.getElementById("dateTime").innerText =
@@ -208,64 +198,67 @@ function updateDateTime() {
 setInterval(updateDateTime, 1000);
 updateDateTime();
 
-/* ===== Load Temperature Summary (FIXED) ===== */
+/* ===== LOAD TEMPERATURE + ALERT ===== */
 function loadTemperature() {
     const tempLogs = JSON.parse(localStorage.getItem("tempLogs")) || [];
+    if (tempLogs.length === 0) return;
 
-    if (tempLogs.length > 0) {
-        const last = tempLogs[tempLogs.length - 1];
+    const last = tempLogs[tempLogs.length - 1];
 
-        // ค่าอุณหภูมิ
-        document.getElementById("tempValue").innerText =
-            last.temp + " °C";
+    document.getElementById("tempValue").innerText =
+        last.temp + " °C";
 
-        // สถานะ
-        const statusEl = document.getElementById("tempStatus");
-        statusEl.innerText = last.status;
-        statusEl.className =
-            "value " + (last.status === "ปกติ" ? "normal" : "abnormal");
+    const statusEl = document.getElementById("tempStatus");
+    const card = document.getElementById("tempCard");
+
+    statusEl.innerText = last.status;
+    statusEl.className =
+        "value " + (last.status === "ปกติ" ? "normal" : "abnormal");
+
+    /* 🚨 ALERT */
+    if (last.status === "ผิดปกติ") {
+        card.classList.add("alert-card");
+
+        const alertKey = last.date + last.time;
+        const lastAlert = localStorage.getItem("lastTempAlert");
+
+        if (lastAlert !== alertKey) {
+            alert("🚨 แจ้งเตือน!\nอุณหภูมิผิดปกติ: " + last.temp + " °C");
+            localStorage.setItem("lastTempAlert", alertKey);
+        }
     } else {
-        document.getElementById("tempValue").innerText = "--";
-        document.getElementById("tempStatus").innerText = "--";
+        card.classList.remove("alert-card");
     }
 }
 
-/* ===== Load Visitor Count ===== */
-function loadVisitors() {
-    const today = new Date().toISOString().split("T")[0];
-    const visitors = JSON.parse(localStorage.getItem("visitorLogs")) || [];
-    const todayCount = visitors.filter(v => v.date === today).length;
+/* โหลดทันที + realtime */
+loadTemperature();
+setInterval(loadTemperature, 2000);
 
+/* ===== LOAD VISITOR DASHBOARD ===== */
+function loadVisitors() {
+    const visitors = JSON.parse(localStorage.getItem("visitorLogs")) || [];
+
+    if (visitors.length === 0) {
+        document.getElementById("visitorCount").innerText = 0;
+        document.getElementById("lastVisitor").innerText = "--";
+        return;
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+
+    /* จำนวนผู้เข้าออกวันนี้ */
+    const todayCount = visitors.filter(v => v.date === today).length;
     document.getElementById("visitorCount").innerText = todayCount;
+
+    /* ผู้เข้าล่าสุด */
+    const last = visitors[visitors.length - 1];
+    document.getElementById("lastVisitor").innerText =
+        last.firstName + " " + last.lastName + " (" + last.timeIn + ")";
 }
 
-loadTemperature();
 loadVisitors();
 </script>
 
-<button onclick="logout()">Logout</button>
-
-<script>
-function logout(){
-  localStorage.removeItem("currentUser");
-  location.href="login.html";
-}
-</script>
-
-
-/* ===== Load Visitor Count*
-<script>
-function loadVisitorDashboard() {
-    const visitors = JSON.parse(localStorage.getItem("visitorLogs")) || [];
-
-    const today = new Date().toISOString().split("T")[0];
-
-    const todayVisitors = visitors.filter(v => v.date === today);
-
-    document.getElementById("visitorCount").innerText =
-        todayVisitors.length;
-}
-
-loadVisitorDashboard();
-</script>
-
+</body>
+</html>
