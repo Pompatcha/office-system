@@ -2,145 +2,37 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<title>Room Temperature Logging</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>System Report</title>
 
 <style>
 body {
+    margin: 0;
     font-family: "Segoe UI", Tahoma, sans-serif;
     background: #f2f4f7;
-    margin: 0;
 }
-
-/* ===== Layout ===== */
-.wrapper {
-    display: flex;
-    min-height: 100vh;
-}
-
+.wrapper { display:flex; min-height:100vh; }
 .sidebar {
-    width: 240px;
-    background: #0d6efd;
-    color: #fff;
-    padding: 20px;
+    width:240px; background:#0d6efd; color:#fff; padding:20px;
 }
-
-.sidebar h2 {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
 .sidebar a {
-    display: block;
-    color: #fff;
-    text-decoration: none;
-    padding: 12px;
-    border-radius: 6px;
-    margin-bottom: 10px;
+    display:block; color:#fff; text-decoration:none;
+    padding:12px; border-radius:6px; margin-bottom:10px;
 }
-
-.sidebar a:hover,
-.sidebar a.active {
-    background: rgba(255,255,255,0.2);
+.sidebar a.active, .sidebar a:hover {
+    background:rgba(255,255,255,.2);
 }
-
-.main {
-    flex: 1;
-    padding: 25px;
+.main { flex:1; padding:25px; }
+.container {
+    background:#fff; padding:25px; border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
 }
+table { width:100%; border-collapse:collapse; }
+th,td { border:1px solid #ddd; padding:10px; text-align:center; }
+th { background:#0d6efd; color:#fff; }
 
-.header {
-    font-size: 22px;
-    margin-bottom: 20px;
-}
-
-/* ===== Filter ===== */
-.filters {
-    background: #fff;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-
-.filters label {
-    font-weight: bold;
-}
-
-.filters input {
-    padding: 6px;
-}
-
-/* ===== Tables ===== */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 30px;
-    background: #fff;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-    font-size: 14px;
-}
-
-th {
-    background: #0d6efd;
-    color: #fff;
-}
-
-.status-normal {
-    color: #198754;
-    font-weight: bold;
-}
-
-.status-abnormal {
-    color: #dc3545;
-    font-weight: bold;
-}
-
-/* ===== Buttons ===== */
-.buttons {
-    margin-bottom: 20px;
-}
-
-button {
-    padding: 10px 18px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-.print-btn {
-    background: #6c757d;
-    color: #fff;
-}
-
-/* ===== Print ===== */
-@media print {
-    body {
-        background: #fff;
-    }
-
-    .sidebar,
-    .filters,
-    .buttons {
-        display: none;
-    }
-
-    .main {
-        padding: 0;
-    }
-
-    table {
-        font-size: 12px;
-    }
-}
+.status-normal { color:#198754; font-weight:bold; }
+.status-abnormal { color:#dc3545; font-weight:bold; }
 </style>
 </head>
 
@@ -164,122 +56,103 @@ button {
     <!-- Main Content -->
     <div class="main">
         <div class="header">Dashboard ภาพรวมระบบ</div>
-    <!-- Main -->
-    <div class="main">
-        <div class="header">รายงานระบบ (Report)</div>
 
-        <!-- Filters -->
-        <div class="filters">
-            <div>
-                <label>วันที่เริ่มต้น</label><br>
-                <input type="date" id="startDate">
-            </div>
-            <div>
-                <label>วันที่สิ้นสุด</label><br>
-                <input type="date" id="endDate">
-            </div>
-            <div style="align-self:flex-end;">
-                <button onclick="loadReport()">แสดงรายงาน</button>
-            </div>
-        </div>
 
-        <div class="buttons">
-            <button class="print-btn" onclick="window.print()">พิมพ์รายงาน</button>
-        </div>
+<div class="main">
+<div class="container">
+<h2>บันทึกอุณหภูมิห้อง</h2>
 
-        <!-- Temperature Report -->
-        <h3>🌡 รายงานอุณหภูมิ</h3>
-        <table id="tempTable">
-            <thead>
-                <tr>
-                    <th>วันที่</th>
-                    <th>เวลา</th>
-                    <th>อุณหภูมิ (°C)</th>
-                    <th>ความชื้น (%RH)</th>
-                    <th>สถานะ</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+<table id="logTable">
+<thead>
+<tr>
+    <th>วันที่</th>
+    <th>เวลา</th>
+    <th>อุณหภูมิ (°C)</th>
+    <th>ความชื้น</th>
+    <th>สถานะ</th>
+    <th>หมายเหตุ</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
 
-        <!-- Visitor Report -->
-        <h3>🛂 รายงานบุคคลเข้า–ออก</h3>
-        <table id="visitorTable">
-            <thead>
-                <tr>
-                    <th>วันที่</th>
-                    <th>ชื่อ</th>
-                    <th>นามสกุล</th>
-                    <th>ทะเบียนรถ</th>
-                    <th>เวลาเข้า</th>
-                    <th>เวลาออก</th>
-                    <th>วัตถุประสงค์</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+<br>
 
-    </div>
+<table>
+<tr>
+<td><input type="date" id="date"></td>
+<td>
+<select id="time">
+<option value="09:00">09:00</option>
+<option value="16:00">16:00</option>
+</select>
+</td>
+<td><input type="number" id="temp" step="0.1"></td>
+<td><input type="number" id="hum" step="0.1"></td>
+<td id="autoStatus">-</td>
+<td><input type="text" id="note"></td>
+</tr>
+</table>
+
+<br>
+<button onclick="saveData()">บันทึกข้อมูล</button>
+
+</div>
+</div>
 </div>
 
 <script>
-const tempLogs = JSON.parse(localStorage.getItem("temperatureLogs")) || [];
-const visitorLogs = JSON.parse(localStorage.getItem("visitorLogs")) || [];
+let tempLogs = JSON.parse(localStorage.getItem("tempLogs")) || [];
 
-function inRange(date, start, end) {
-    if (!start && !end) return true;
-    if (start && date < start) return false;
-    if (end && date > end) return false;
-    return true;
+function getStatus(temp){
+    return temp <= 30 ? "ปกติ" : "ผิดปกติ";
 }
 
-function loadReport() {
-    const start = document.getElementById("startDate").value;
-    const end = document.getElementById("endDate").value;
+document.getElementById("temp").addEventListener("input", e=>{
+    const t = parseFloat(e.target.value);
+    const cell = document.getElementById("autoStatus");
+    if(isNaN(t)){ cell.innerText="-"; return; }
+    const s = getStatus(t);
+    cell.innerText = s;
+    cell.className = s==="ปกติ"?"status-normal":"status-abnormal";
+});
 
-    /* ===== Temperature ===== */
-    const tempBody = document.querySelector("#tempTable tbody");
-    tempBody.innerHTML = "";
+function saveData(){
+    const data = {
+        date: date.value,
+        time: time.value,
+        temp: parseFloat(temp.value),
+        hum: parseFloat(hum.value),
+        status: getStatus(parseFloat(temp.value)),
+        note: note.value
+    };
 
-    tempLogs
-        .filter(t => inRange(t.date, start, end))
-        .forEach(t => {
-            tempBody.innerHTML += `
-                <tr>
-                    <td>${t.date}</td>
-                    <td>${t.time}</td>
-                    <td>${t.temp}</td>
-                    <td>${t.humidity}</td>
-                    <td class="${t.status === 'ปกติ' ? 'status-normal' : 'status-abnormal'}">
-                        ${t.status}
-                    </td>
-                </tr>
-            `;
-        });
+    if(!data.date || isNaN(data.temp)){
+        alert("กรอกข้อมูลไม่ครบ");
+        return;
+    }
 
-    /* ===== Visitor ===== */
-    const visitorBody = document.querySelector("#visitorTable tbody");
-    visitorBody.innerHTML = "";
-
-    visitorLogs
-        .filter(v => inRange(v.date, start, end))
-        .forEach(v => {
-            visitorBody.innerHTML += `
-                <tr>
-                    <td>${v.date}</td>
-                    <td>${v.firstName}</td>
-                    <td>${v.lastName}</td>
-                    <td>${v.carPlate}</td>
-                    <td>${v.timeIn}</td>
-                    <td>${v.timeOut}</td>
-                    <td>${v.purpose}</td>
-                </tr>
-            `;
-        });
+    tempLogs.push(data);
+    localStorage.setItem("tempLogs", JSON.stringify(tempLogs));
+    renderTable();
 }
 
-/* โหลดรายงานทั้งหมดตอนเปิดหน้า */
-loadReport();
+function renderTable(){
+    const tb = document.querySelector("#logTable tbody");
+    tb.innerHTML = "";
+    tempLogs.forEach(l=>{
+        tb.innerHTML += `
+        <tr>
+            <td>${l.date}</td>
+            <td>${l.time}</td>
+            <td>${l.temp}</td>
+            <td>${l.hum}</td>
+            <td class="${l.status==="ปกติ"?"status-normal":"status-abnormal"}">${l.status}</td>
+            <td>${l.note}</td>
+        </tr>`;
+    });
+}
+renderTable();
 </script>
 
 </body>
