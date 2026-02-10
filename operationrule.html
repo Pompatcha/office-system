@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>FAOS | กฎระเบียบการทำงาน</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background: #f2f4f7;
+}
+
+/* ===== Layout ===== */
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+    width: 240px;
+    background: #0d6efd;
+    color: #fff;
+    padding: 20px;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 20px;
+}
+
+.sidebar a {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background: rgba(255,255,255,0.2);
+}
+
+/* ===== Main ===== */
+.main {
+    flex: 1;
+    padding: 25px;
+}
+
+.header {
+    font-size: 22px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* ===== Content ===== */
+.container {
+    max-width: 900px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.container h3 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #0d6efd;
+}
+
+/* ===== Rules ===== */
+.rule {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.rule span {
+    font-weight: bold;
+    color: #0d6efd;
+}
+
+.rule p {
+    margin: 0;
+    font-size: 16px;
+}
+
+/* ===== Acknowledge ===== */
+.ack-box {
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 10px;
+    background: #eef3ff;
+}
+
+.ack-box input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.ack-box label {
+    font-size: 15px;
+}
+
+.buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.confirm-btn {
+    background: #198754;
+    color: #fff;
+}
+
+.pdf-btn {
+    background: #6c757d;
+    color: #fff;
+}
+
+/* ===== Print ===== */
+@media print {
+    .sidebar,
+    .buttons {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <!-- Sidebar -->
+  <div class="sidebar">
+        <h2>Office System</h2>
+        <a href="index.html">🏠 Dashboard</a>
+        <a href="temperature.html">🌡 Temperature Control</a>
+        <a href="visitor.html">🛂 Visitor Log</a>
+        <a href="inventory.html">📁 Inventory</a>
+        <a href="report.html">🖨 Reports</a>
+        <a href="staff.html">👥 Staff</a>
+         <a href="operationrule.html" class="active">📜 Operation Rules</a>
+        <a href="quotation.html">🧾 Quotation</a>
+        <a href="invoice.html">🧾 Invoice</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="header">โครงสร้างบุคลากร FAOS</div>
+
+        <div class="container">
+            <h3>กฎระเบียบการทำงาน (Operation Rules)</h3>
+
+            <div class="rule"><span>1.</span><p>ทำความสะอาดสถานที่ปฏิบัติงานทุกเช้า ก่อนเริ่มการปฏิบัติงาน</p></div>
+            <div class="rule"><span>2.</span><p>ควบคุมและบันทึกบุคคลและยานพาหนะเข้า–ออกบริษัทและที่พักสินค้า ทุกครั้ง</p></div>
+            <div class="rule"><span>3.</span><p>ก่อนเข้าห้องเก็บสินค้า ต้องสวมชุดป้องกันฝุ่น และล้างมือทำความสะอาดทุกครั้ง</p></div>
+            <div class="rule"><span>4.</span><p>ไม่เก็บสินค้าอื่นนอกเหนือจากที่กำหนด</p></div>
+            <div class="rule"><span>5.</span><p>พนักงานและบุคลากรต้องได้รับการตรวจสุขภาพประจำปี</p></div>
+            <div class="rule"><span>6.</span><p>ต้องบันทึกข้อมูลสินค้าเข้า–ออกในระบบทุกครั้ง</p></div>
+            <div class="rule"><span>7.</span><p>ตรวจสอบและบันทึกอุณหภูมิจัดเก็บสินค้าวันละ 2 ครั้งเวลา 09:00 และ 16:00</p></div>
+
+            <!-- ===== Acknowledge ===== -->
+            <div class="ack-box">
+                <label>
+                    <input type="checkbox" id="ackCheck">
+                    ข้าพเจ้าได้อ่านและรับทราบกฎระเบียบการทำงานทั้งหมดแล้ว
+                </label>
+
+                <input type="text" id="ackName" placeholder="ชื่อ – นามสกุล ผู้รับทราบ">
+
+                <div class="buttons">
+                    <button class="confirm-btn" onclick="confirmRule()">ยืนยันการรับทราบ</button>
+                    <button class="pdf-btn" onclick="exportPDF()">Export PDF (Audit)</button>
+                </div>
+
+                <p id="ackResult"></p>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+function confirmRule() {
+    const check = document.getElementById("ackCheck").checked;
+    const name = document.getElementById("ackName").value.trim();
+
+    if (!check || !name) {
+        alert("กรุณาติ๊กยอมรับกฎ และกรอกชื่อให้ครบ");
+        return;
+    }
+
+    const record = {
+        name: name,
+        date: new Date().toLocaleDateString("th-TH"),
+        time: new Date().toLocaleTimeString("th-TH")
+    };
+
+    localStorage.setItem("operationRuleAck", JSON.stringify(record));
+
+    document.getElementById("ackResult").innerHTML =
+        "✅ รับทราบโดย: <b>" + record.name +
+        "</b><br>📅 วันที่: " + record.date +
+        " ⏰ เวลา: " + record.time;
+}
+
+function exportPDF() {
+    window.print();
+}
+
+/* โหลดข้อมูลเดิม */
+const saved = JSON.parse(localStorage.getItem("operationRuleAck"));
+if (saved) {
+    document.getElementById("ackResult").innerHTML =
+        "✅ รับทราบโดย: <b>" + saved.name +
+        "</b><br>📅 วันที่: " + saved.date +
+        " ⏰ เวลา: " + saved.time;
+}
+</script>
+
+</body>
+</html>
