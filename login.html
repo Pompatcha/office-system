@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>FAOS Login</title>
+
+<style>
+:root{
+  --main:#9c7a3c;   /* Olive Gold */
+  --bg:#f7f4ef;
+}
+
+body{
+  font-family:"Segoe UI",Tahoma,sans-serif;
+  background:var(--bg);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.login-box{
+  background:#fff;
+  padding:30px;
+  width:380px;
+  border-radius:12px;
+  box-shadow:0 6px 18px rgba(0,0,0,.15);
+  text-align:center;
+}
+
+.logo{
+  width:120px;
+  margin-bottom:10px;
+}
+
+select,input,button{
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+}
+
+button{
+  background:var(--main);
+  color:#fff;
+  border:none;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.social button{
+  background:#eee;
+  color:#333;
+}
+
+.social button:hover{
+  background:#ddd;
+}
+
+.remember{
+  text-align:left;
+  font-size:14px;
+}
+
+.theme button{
+  width:32%;
+  font-size:12px;
+}
+
+a{color:var(--main);text-decoration:none}
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+  <img src="faos-logo.png" class="logo">
+
+  <h2 id="title">Login</h2>
+
+  <!-- Language -->
+  <select onchange="changeLang(this.value)" id="lang">
+    <option value="en">English</option>
+    <option value="th">ไทย</option>
+    <option value="gr">Ελληνικά</option>
+  </select>
+
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+
+  <div class="remember">
+    <input type="checkbox" id="remember"> Remember me
+  </div>
+
+  <button onclick="login()">Login</button>
+
+  <!-- Social Login -->
+  <div class="social">
+    <button onclick="social('google')">🔐 Google</button>
+    <button onclick="social('facebook')">📘 Facebook</button>
+    <button onclick="social('instagram')">📸 Instagram</button>
+  </div>
+
+  <p>New user? <a href="register.html">Register</a></p>
+
+  <!-- Theme -->
+  <div class="theme">
+    <button onclick="theme('olive')">🫒 Olive</button>
+    <button onclick="theme('honey')">🍯 Honey</button>
+    <button onclick="theme('wine')">🍷 Wine</button>
+  </div>
+</div>
+
+<script>
+/* ---------- LANGUAGE ---------- */
+const text = {
+  en:{title:"Login",user:"Username",pass:"Password"},
+  th:{title:"เข้าสู่ระบบ",user:"ชื่อผู้ใช้",pass:"รหัสผ่าน"},
+  gr:{title:"Σύνδεση",user:"Όνομα χρήστη",pass:"Κωδικός"}
+};
+
+function changeLang(l){
+  title.innerText = text[l].title;
+  username.placeholder = text[l].user;
+  password.placeholder = text[l].pass;
+  localStorage.setItem("lang",l);
+}
+
+/* Auto detect */
+const autoLang = navigator.language.slice(0,2);
+changeLang(localStorage.getItem("lang") || autoLang || "en");
+
+/* ---------- LOGIN ---------- */
+async function login(){
+  const res = await fetch("/auth/login",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({
+      username:username.value,
+      password:password.value,
+      remember:remember.checked
+    })
+  });
+
+  if(res.ok){
+    window.location.href="index.html";
+  }else{
+    alert("Login failed");
+  }
+}
+
+/* ---------- SOCIAL ---------- */
+function social(p){
+  window.location.href = `/auth/${p}`;
+}
+
+/* ---------- THEME ---------- */
+function theme(t){
+  if(t==="olive"){
+    document.documentElement.style.setProperty("--main","#9c7a3c");
+    document.documentElement.style.setProperty("--bg","#f7f4ef");
+  }
+  if(t==="honey"){
+    document.documentElement.style.setProperty("--main","#d4a017");
+    document.documentElement.style.setProperty("--bg","#fff7e6");
+  }
+  if(t==="wine"){
+    document.documentElement.style.setProperty("--main","#7a1f2b");
+    document.documentElement.style.setProperty("--bg","#fbeff1");
+  }
+}
+</script>
+
+</body>
+</html>
