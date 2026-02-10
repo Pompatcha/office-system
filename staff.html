@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>FAOS | Personnel</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+    background: #f2f4f7;
+}
+/* ===== Layout ===== */
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+    width: 240px;
+    background: #0d6efd;
+    color: #fff;
+    padding: 20px;
+}
+
+.sidebar h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 20px;
+}
+
+.sidebar a {
+    display: block;
+    color: #fff;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background: rgba(255,255,255,0.2);
+}
+
+/* ===== Main ===== */
+.main {
+    flex: 1;
+    padding: 25px;
+}
+
+.header {
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+/* ===== Staff Cards ===== */
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.staff-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.staff-photo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #c9a24d;
+}
+
+.staff-info h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.nickname {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.staff-info p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.health {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.health.good {
+    background: #d4edda;
+    color: #155724;
+}
+
+.health.warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.health.bad {
+    background: #f8d7da;
+    color: #721c24;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+     <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Office System</h2>
+        <a href="index.html">🏠 Dashboard</a>
+        <a href="temperature.html">🌡 Temperature Control</a>
+        <a href="visitor.html">🛂 Visitor Log</a>
+        <a href="inventory.html">📁 Inventory</a>
+        <a href="report.html">🖨 Reports</a>
+        <a href="staff.html">👥 Staff</a>
+         <a href="operationrule.html" class="active">📜 Operation Rules</a>
+        <a href="quotation.html">🧾 Quotation</a>
+        <a href="invoice.html">🧾 Invoice</a>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="header">โครงสร้างบุคลากร FAOS</div>
+
+        <!-- JS will render staff here -->
+        <div class="staff-grid" id="staffGrid"></div>
+    </div>
+
+</div>
+
+<!-- ================= JavaScript + JSON ================= -->
+<script>
+/* ===== JSON DATA (เพิ่มพนักงานตรงนี้เท่านั้น) ===== */
+const staffList = [
+    {
+        name: "พัชรินทร์ ชนะภักดี",
+        nickname: "ป้อม",
+        position: "เจ้าของร้าน",
+        phone: "089-693-1668",
+        checkup: "30/09/2568",
+        health: "แข็งแรง",
+        healthClass: "good",
+        photo: "images/staff1.jpg"
+    },
+    {
+        name: "สมชาย ใจดี",
+        nickname: "ชาย",
+        position: "พนักงานคลังสินค้า",
+        phone: "081-234-5678",
+        checkup: "12/01/2569",
+        health: "ต้องติดตาม",
+        healthClass: "warning",
+        photo: "images/staff2.jpg"
+    }
+];
+
+/* ===== Render Staff Cards ===== */
+const grid = document.getElementById("staffGrid");
+
+staffList.forEach(staff => {
+    const card = document.createElement("div");
+    card.className = "staff-card";
+
+    card.innerHTML = `
+        <img src="${staff.photo}" class="staff-photo" alt="${staff.nickname}">
+        <div class="staff-info">
+            <h3>${staff.name}</h3>
+            <div class="nickname">ชื่อเล่น: ${staff.nickname}</div>
+            <p><strong>ตำแหน่ง:</strong> ${staff.position}</p>
+            <p><strong>เบอร์ติดต่อ:</strong> ${staff.phone}</p>
+            <p><strong>ตรวจสุขภาพล่าสุด:</strong> ${staff.checkup}</p>
+            <span class="health ${staff.healthClass}">${staff.health}</span>
+        </div>
+    `;
+
+    grid.appendChild(card);
+});
+</script>
+
+</body>
+</html>
